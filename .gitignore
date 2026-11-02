@@ -1,0 +1,11 @@
+target/
+*.class
+.idea/
+*.iml
+# fichiers lourds du cours (ne pas pousser dans le dépôt Git du TP)
+*.aac
+*.pdf
+# … sauf la documentation du projet
+!doc/*.pdf
+# capture d'écran personnelle (navigateur), pas une partie du projet
+capture_depot/
