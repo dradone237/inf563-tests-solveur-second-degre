@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>SolveurStable.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package inf563.solveur;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>/**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Version stable : formule stable + mise &#224; l&#39;&#233;chelle par puissances de 2 (diapo 54), corrig&#233;e.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * &#60;p&#62;q additionne deux termes de m&#234;me signe (plus de soustraction de nombres proches),</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * la seconde racine vient de Vi&#232;te (r1&#183;r2 = c/a). Multiplier par 2^k est exact en binaire.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * &#60;p&#62;Correction trouv&#233;e gr&#226;ce au test pairwise : la diapo 54 divise les trois coefficients par la m&#234;me</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * puissance de 2 ; les petits coefficients passent alors sous MIN_VALUE et &#916; devient 0 &#224; tort</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * (ex. (1e-300, 2.5, 1e300) : 1 racine au lieu de 2). Ici on &#233;crit chaque coefficient x = m&#183;2^e</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * (mantisse m dans [1, 2[) et on calcule &#916; = b&#178; &#8722; 4ac = 2^e&#183;d en mettant &#224; l&#39;&#233;chelle b&#178; et 4ac</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * S&#201;PAR&#201;MENT : ni l&#39;un ni l&#39;autre ne peut d&#233;border (+&#8734;) ou s&#39;annuler (sous MIN_VALUE).</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Les racines sont ensuite obtenues par une seule division chacune (q/a et c/q) : si la vraie racine</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * d&#233;passe MAX_VALUE ou passe sous MIN_VALUE, l&#39;arrondi donne &#177;&#8734; ou 0, comme il se doit.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> */</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>public class SolveurStable implements SolveurSecondDegre {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Override</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public double[] racines(double a, double b, double c) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_21'/>
+21
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_21'>3</a>
+<span>
+
+1. racines : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+2. racines : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+3. racines : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (!Double.isFinite(a) || !Double.isFinite(b) || !Double.isFinite(c))</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            throw new IllegalArgumentException(&#34;coefficient non fini (NaN ou infini)&#34;);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_23'/>
+23
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_23'>1</a>
+<span>
+
+1. racines : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (a == 0) throw new IllegalArgumentException(&#34;a = 0&#34;);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_24'/>
+24
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_24'>1</a>
+<span>
+
+1. racines : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (c == 0) {                                   // x&#183;(a&#183;x + b) = 0 : racines 0 et &#8722;b/a</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_25'/>
+25
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_25'>2</a>
+<span>
+
+1. racines : replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED<br/>
+
+2. racines : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            if (b == 0) return new double[]{0.0};       // &#916; = 0 : racine double 0</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_26'/>
+26
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_26'>2</a>
+<span>
+
+1. racines : Replaced double division with multiplication &rarr; KILLED<br/>
+
+2. racines : removed negation &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            double r = -b / a;</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_27'/>
+27
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_27'>1</a>
+<span>
+
+1. racines : replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            return new double[]{Math.min(r, 0.0), Math.max(r, 0.0)};</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // x = m&#183;2^e, mantisse m dans [1, 2[ : multiplier par une puissance de 2 est exact</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_30'/>
+30
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_30'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        int ea = Math.getExponent(a), eb = Math.getExponent(b), ec = Math.getExponent(c);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_31'/>
+31
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_31'>3</a>
+<span>
+
+1. racines : removed negation &rarr; KILLED<br/>
+
+2. racines : removed negation &rarr; KILLED<br/>
+
+3. racines : removed negation &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        double ma = Math.scalb(a, -ea), mb = Math.scalb(b, -eb), mc = Math.scalb(c, -ec);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_32'/>
+32
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_32'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // &#916; = 2^e&#183;d : e = exposant du plus grand des deux termes b&#178; et 4ac, rendu pair pour la racine carr&#233;e</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_33'/>
+33
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_33'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // (b = 0 : getExponent(0) = &#8722;1023, donc 2&#183;eb &#8804; ea + ec et le max choisit bien 4ac)</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_34'/>
+34
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_34'>2</a>
+<span>
+
+1. racines : Replaced integer addition with subtraction &rarr; KILLED<br/>
+
+2. racines : Replaced integer multiplication with division &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        int e = Math.max(2 * eb, ea + ec);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_35'/>
+35
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_35'>2</a>
+<span>
+
+1. racines : Replaced integer addition with subtraction &rarr; SURVIVED<br/>
+
+2. racines : Replaced bitwise AND with OR &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        e += e &#38; 1;                                     // pair sup&#233;rieur (le pair inf&#233;rieur marcherait aussi)</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_36'/>
+36
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_36'>8</a>
+<span>
+
+1. racines : Replaced double multiplication with division &rarr; KILLED<br/>
+
+2. racines : Replaced integer addition with subtraction &rarr; KILLED<br/>
+
+3. racines : Replaced integer subtraction with addition &rarr; KILLED<br/>
+
+4. racines : Replaced double subtraction with addition &rarr; KILLED<br/>
+
+5. racines : Replaced integer multiplication with division &rarr; KILLED<br/>
+
+6. racines : Replaced integer subtraction with addition &rarr; KILLED<br/>
+
+7. racines : Replaced double multiplication with division &rarr; KILLED<br/>
+
+8. racines : Replaced double multiplication with division &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        double d = Math.scalb(mb * mb, 2 * eb - e) - Math.scalb(4 * ma * mc, ea + ec - e);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_37'/>
+37
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_37'>3</a>
+<span>
+
+1. racines : replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED<br/>
+
+2. racines : changed conditional boundary &rarr; KILLED<br/>
+
+3. racines : removed conditional - replaced comparison check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (d &#60; 0) return new double[0];</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_38'/>
+38
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_38'>5</a>
+<span>
+
+1. racines : replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED<br/>
+
+2. racines : Replaced double division with multiplication &rarr; KILLED<br/>
+
+3. racines : removed negation &rarr; KILLED<br/>
+
+4. racines : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+5. racines : Replaced double division with multiplication &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (d == 0) return new double[]{-(b / a) / 2};</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_39'/>
+39
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_39'>1</a>
+<span>
+
+1. racines : Replaced integer division with multiplication &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        double s = Math.scalb(Math.sqrt(d), e / 2);     // &#8730;&#916; = &#8730;d &#183; 2^(e/2)</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_40'/>
+40
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_40'>2</a>
+<span>
+
+1. racines : Replaced double multiplication with division &rarr; KILLED<br/>
+
+2. racines : Replaced double addition with subtraction &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        double q = -0.5 * (b + Math.copySign(s, b));</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_41'/>
+41
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_41'>2</a>
+<span>
+
+1. racines : Replaced double division with multiplication &rarr; KILLED<br/>
+
+2. racines : Replaced double division with multiplication &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        double r1 = q / a, r2 = c / q;                  // Vi&#232;te : r1 * r2 = c / a</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_42'/>
+42
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_42'>1</a>
+<span>
+
+1. racines : replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return new double[]{Math.min(r1, r2), Math.max(r1, r2)};</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_43'/>
+43
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_43'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@64910b2d_44'/>
+44
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_44'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_21'>21</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_21'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#71]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#3]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</p> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#3]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_23'>23</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_23'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[method:aNul()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_24'>24</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_24'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:casMutation(double, double, double, java.lang.String)]/[test-template-invocation:#1]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_25'>25</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_25'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#3]</span></span> replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#3]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_26'>26</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_26'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#68]</span></span> Replaced double division with multiplication &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#68]</span></span> removed negation &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_27'>27</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_27'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#68]</span></span> replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_31'>31</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_31'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#31]</span></span> removed negation &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#6]</span></span> removed negation &rarr; KILLED</p> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#73]</span></span> removed negation &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_34'>34</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_34'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#12]</span></span> Replaced integer addition with subtraction &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:discriminantNegatif(double, double, double)]/[test-template-invocation:#2]</span></span> Replaced integer multiplication with division &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_35'>35</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_35'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>none</span></span> Replaced integer addition with subtraction &rarr; SURVIVED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#6]</span></span> Replaced bitwise AND with OR &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_36'>36</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_36'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#75]</span></span> Replaced double multiplication with division &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#73]</span></span> Replaced integer addition with subtraction &rarr; KILLED</p> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#31]</span></span> Replaced integer subtraction with addition &rarr; KILLED</p> <p class='KILLED'><span class='pop'>4.<span><b>4</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#75]</span></span> Replaced double subtraction with addition &rarr; KILLED</p> <p class='KILLED'><span class='pop'>5.<span><b>5</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#31]</span></span> Replaced integer multiplication with division &rarr; KILLED</p> <p class='KILLED'><span class='pop'>6.<span><b>6</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#73]</span></span> Replaced integer subtraction with addition &rarr; KILLED</p> <p class='KILLED'><span class='pop'>7.<span><b>7</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#18]</span></span> Replaced double multiplication with division &rarr; KILLED</p> <p class='KILLED'><span class='pop'>8.<span><b>8</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#6]</span></span> Replaced double multiplication with division &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_37'>37</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_37'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:discriminantNegatif(double, double, double)]/[test-template-invocation:#3]</span></span> replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#7]</span></span> changed conditional boundary &rarr; KILLED</p> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#75]</span></span> removed conditional - replaced comparison check with false &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_38'>38</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_38'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#7]</span></span> replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#7]</span></span> Replaced double division with multiplication &rarr; KILLED</p> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#7]</span></span> removed negation &rarr; KILLED</p> <p class='KILLED'><span class='pop'>4.<span><b>4</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#7]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</p> <p class='KILLED'><span class='pop'>5.<span><b>5</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:casMutation(double, double, double, java.lang.String)]/[test-template-invocation:#2]</span></span> Replaced double division with multiplication &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_39'>39</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_39'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#6]</span></span> Replaced integer division with multiplication &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_40'>40</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_40'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#6]</span></span> Replaced double multiplication with division &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#41]</span></span> Replaced double addition with subtraction &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_41'>41</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_41'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:echelle(double, double, double)]/[test-template-invocation:#3]</span></span> Replaced double division with multiplication &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#6]</span></span> Replaced double division with multiplication &rarr; KILLED</p> 
+</td>
+</tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@64910b2d_42'>42</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@64910b2d_42'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>racines<br/><b>Killed by : </b>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#6]</span></span> replaced return value with null for inf563/solveur/SolveurStable::racines &rarr; KILLED</p> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+
+<li class='mutator'>EMPTY_RETURNS</li>
+
+<li class='mutator'>FALSE_RETURNS</li>
+
+<li class='mutator'>INCREMENTS</li>
+
+<li class='mutator'>INVERT_NEGS</li>
+
+<li class='mutator'>MATH</li>
+
+<li class='mutator'>NULL_RETURNS</li>
+
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+
+<li class='mutator'>REMOVE_CONDITIONALS_EQUAL_ELSE</li>
+
+<li class='mutator'>REMOVE_CONDITIONALS_ORDER_ELSE</li>
+
+<li class='mutator'>TRUE_RETURNS</li>
+
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#75] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#31] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#73] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#6] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#8] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#13] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:echelle(double, double, double)]/[test-template-invocation:#3] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#18] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#11] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#4] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#37] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#16] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#39] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#10] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#56] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#12] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#41] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#64] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#6] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#62] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:discriminantNegatif(double, double, double)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#8] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#81] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#16] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#14] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:construction(double, double)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:residu(double, double, double)]/[test-template-invocation:#3] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:viete(double, double, double)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:oppose(double, double, double)]/[test-template-invocation:#1] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#18] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#4] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:differentiel(double, double, double)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#8] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#45] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#43] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#66] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#74] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#72] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#70] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#5] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#7] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#1] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#12] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:echelle(double, double, double)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#3] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#10] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#59] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#9] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#57] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#13] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#55] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:discriminantNegatif(double, double, double)]/[test-template-invocation:#3] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#7] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:discriminantNegatif(double, double, double)]/[test-template-invocation:#1] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#40] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#61] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#80] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#17] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:oppose(double, double, double)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#15] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:construction(double, double)]/[test-template-invocation:#3] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#3] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:residu(double, double, double)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:viete(double, double, double)]/[test-template-invocation:#1] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#19] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#5] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-factory:constructionGeneree()]/[dynamic-test:#20] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:casMutation(double, double, double, java.lang.String)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#7] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#67] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#9] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#65] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#1] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#58] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#35] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#77] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#2] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#17] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#32] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#34] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:differentiel(double, double, double)]/[test-template-invocation:#3] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#29] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:echelle(double, double, double)]/[test-template-invocation:#1] (2 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:differentiel(double, double, double)]/[test-template-invocation:#1] (2 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#5] (2 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:residu(double, double, double)]/[test-template-invocation:#1] (4 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#4] (4 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:parReference(double, double, double, double, double, double, java.lang.String)]/[test-template-invocation:#1] (5 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#28] (7 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:construction(double, double)]/[test-template-invocation:#1] (7 ms)</li><li>inf563.solveur.ChargeurSolveurTest.[engine:junit-jupiter]/[class:inf563.solveur.ChargeurSolveurTest]/[test-template:chargeParLeNom(java.lang.String)]/[test-template-invocation:#1] (18 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#3] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#68] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#11] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#44] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#76] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#36] (1 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:casMutation(double, double, double, java.lang.String)]/[test-template-invocation:#1] (9 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#71] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#8] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#14] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#79] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[method:aNul()] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#26] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#22] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#11] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#7] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#63] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#25] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#21] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#10] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#20] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#30] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#19] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#38] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#9] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#27] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#23] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#4] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#33] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#60] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#78] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#6] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#6] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#24] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#15] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#5] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#42] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#69] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#52] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#49] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#51] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#3] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#48] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#50] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#2] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#54] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#47] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#53] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:pairwise(inf563.solveur.CategorieReel, inf563.solveur.CategorieReel, inf563.solveur.CategorieReel)]/[test-template-invocation:#46] (0 ms)</li><li>inf563.solveur.SolveurStableTest.[engine:junit-jupiter]/[class:inf563.solveur.SolveurStableTest]/[test-template:classeInvalide(double, double, double)]/[test-template-invocation:#1] (1 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.15.3
+
+</body>
+</html>

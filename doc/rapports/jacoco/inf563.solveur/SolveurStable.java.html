@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SolveurStable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">solveur-second-degre</a> &gt; <a href="index.source.html" class="el_package">inf563.solveur</a> &gt; <span class="el_source">SolveurStable.java</span></div><h1>SolveurStable.java</h1><pre class="source lang-java linenums">package inf563.solveur;
+
+/**
+ * Version stable : formule stable + mise à l'échelle par puissances de 2 (diapo 54), corrigée.
+ *
+ * &lt;p&gt;q additionne deux termes de même signe (plus de soustraction de nombres proches),
+ * la seconde racine vient de Viète (r1·r2 = c/a). Multiplier par 2^k est exact en binaire.
+ *
+ * &lt;p&gt;Correction trouvée grâce au test pairwise : la diapo 54 divise les trois coefficients par la même
+ * puissance de 2 ; les petits coefficients passent alors sous MIN_VALUE et Δ devient 0 à tort
+ * (ex. (1e-300, 2.5, 1e300) : 1 racine au lieu de 2). Ici on écrit chaque coefficient x = m·2^e
+ * (mantisse m dans [1, 2[) et on calcule Δ = b² − 4ac = 2^e·d en mettant à l'échelle b² et 4ac
+ * SÉPARÉMENT : ni l'un ni l'autre ne peut déborder (+∞) ou s'annuler (sous MIN_VALUE).
+ * Les racines sont ensuite obtenues par une seule division chacune (q/a et c/q) : si la vraie racine
+ * dépasse MAX_VALUE ou passe sous MIN_VALUE, l'arrondi donne ±∞ ou 0, comme il se doit.
+ */
+<span class="fc" id="L17">public class SolveurStable implements SolveurSecondDegre {</span>
+
+    @Override
+    public double[] racines(double a, double b, double c) {
+<span class="fc bfc" id="L21" title="All 6 branches covered.">        if (!Double.isFinite(a) || !Double.isFinite(b) || !Double.isFinite(c))</span>
+<span class="fc" id="L22">            throw new IllegalArgumentException(&quot;coefficient non fini (NaN ou infini)&quot;);</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (a == 0) throw new IllegalArgumentException(&quot;a = 0&quot;);</span>
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        if (c == 0) {                                   // x·(a·x + b) = 0 : racines 0 et −b/a</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">            if (b == 0) return new double[]{0.0};       // Δ = 0 : racine double 0</span>
+<span class="fc" id="L26">            double r = -b / a;</span>
+<span class="fc" id="L27">            return new double[]{Math.min(r, 0.0), Math.max(r, 0.0)};</span>
+        }
+        // x = m·2^e, mantisse m dans [1, 2[ : multiplier par une puissance de 2 est exact
+<span class="fc" id="L30">        int ea = Math.getExponent(a), eb = Math.getExponent(b), ec = Math.getExponent(c);</span>
+<span class="fc" id="L31">        double ma = Math.scalb(a, -ea), mb = Math.scalb(b, -eb), mc = Math.scalb(c, -ec);</span>
+        // Δ = 2^e·d : e = exposant du plus grand des deux termes b² et 4ac, rendu pair pour la racine carrée
+        // (b = 0 : getExponent(0) = −1023, donc 2·eb ≤ ea + ec et le max choisit bien 4ac)
+<span class="fc" id="L34">        int e = Math.max(2 * eb, ea + ec);</span>
+<span class="fc" id="L35">        e += e &amp; 1;                                     // pair supérieur (le pair inférieur marcherait aussi)</span>
+<span class="fc" id="L36">        double d = Math.scalb(mb * mb, 2 * eb - e) - Math.scalb(4 * ma * mc, ea + ec - e);</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (d &lt; 0) return new double[0];</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if (d == 0) return new double[]{-(b / a) / 2};</span>
+<span class="fc" id="L39">        double s = Math.scalb(Math.sqrt(d), e / 2);     // √Δ = √d · 2^(e/2)</span>
+<span class="fc" id="L40">        double q = -0.5 * (b + Math.copySign(s, b));</span>
+<span class="fc" id="L41">        double r1 = q / a, r2 = c / q;                  // Viète : r1 * r2 = c / a</span>
+<span class="fc" id="L42">        return new double[]{Math.min(r1, r2), Math.max(r1, r2)};</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
