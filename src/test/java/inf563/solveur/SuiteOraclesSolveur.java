@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -25,22 +24,34 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Séance 3 : la même suite de tests, exécutée contre les deux versions du solveur.
+ * Chapitres III à V : la même suite de tests, exécutée contre n'importe quelle implémentation du solveur.
  *
  * <p>Modèle d'un test : DE (données d'entrée) → g (système sous test) → y,
  * puis l'oracle O décide PASS / FAIL. Pour l'oracle par référence : N(y, RA) ≤ Tol.
  *
- * <p>Les sous-classes ne font qu'une chose : dire quel g on teste.
+ * <p>Les sous-classes ne font qu'une chose : donner le NOM de la classe à tester.
+ * L'implémentation est chargée et instanciée par réflexion (ChargeurSolveur) : la suite
+ * ne dépend que de l'interface SolveurSecondDegre, jamais d'une classe concrète.
  */
 abstract class SuiteOraclesSolveur {
 
     /** ε = ulp(1) = 2^-52 ≈ 2,2·10^-16 en double. */
     static final double EPS = Math.ulp(1.0);
 
-    /** Le système sous test g : renvoie les racines triées de a·x² + b·x + c = 0. */
-    abstract double[] g(double a, double b, double c);
+    /** L'implémentation sous test, vue uniquement à travers l'interface. */
+    private final SolveurSecondDegre solveur;
 
-    /** Mesure d'erreur N : erreur relative |y − RA| / |RA| (aucun RA n'est nul dans nos cas). */
+    /** JUnit crée une instance par test : chaque test reçoit une instance neuve, chargée par réflexion. */
+    SuiteOraclesSolveur(String nomImplementation) {
+        solveur = ChargeurSolveur.charger(nomImplementation);
+    }
+
+    /** Le système sous test g : renvoie les racines triées de a·x² + b·x + c = 0. */
+    final double[] g(double a, double b, double c) {
+        return solveur.racines(a, b, c);
+    }
+
+    /** Mesure d'erreur N : erreur relative |y − RA| / |RA| (RA ≠ 0 dans parReference ; RA = 0 : voir ReferenceExacte.accepte). */
     static double erreurRelative(double y, double ra) {
         return Math.abs(y - ra) / Math.abs(ra);
     }
@@ -152,33 +163,73 @@ abstract class SuiteOraclesSolveur {
     }
 
     // ------------------------------------------------------------------
-    // 4. Combinaisons : un tableau de valeurs par paramètre, JUnit exécute
-    //    TOUS les cas possibles (produit cartésien : 3 × 4 × 3 = 36 cas).
+    // 4. Pairwise (chapitre 4) : a, b, c prennent chacun leurs valeurs dans les
+    //    9 catégories de réels (CategorieReel, diapo 93). Exhaustif : 9³ = 729 cas ;
+    //    pairwise : 81 cas, chaque paire de valeurs de deux paramètres une fois (Pairwise).
     // ------------------------------------------------------------------
-    static final double[] VALEURS_A = {-2, 1, 3};
-    static final double[] VALEURS_B = {-5, 0, 1, 1e8};
-    static final double[] VALEURS_C = {-4, 0, 2};
-
-    static Stream<Arguments> toutesLesCombinaisons() {
-        return Arrays.stream(VALEURS_A).boxed().flatMap(a ->
-                Arrays.stream(VALEURS_B).boxed().flatMap(b ->
-                        Arrays.stream(VALEURS_C).mapToObj(c -> Arguments.of(a, b, c))));
+    static Stream<Arguments> casPairwise() {
+        return Pairwise.tableauOrthogonal().stream().map(t -> Arguments.of(t[0], t[1], t[2]));
     }
 
-    /** Aucun RA : nombre de racines donné par le signe EXACT de Δ (BigDecimal), puis résidu (erreur inverse). */
-    @ParameterizedTest(name = "[{index}] a = {0}, b = {1}, c = {2}")
-    @MethodSource("toutesLesCombinaisons")
-    @DisplayName("Combinaisons de paramètres : tous les cas possibles")
-    void combinaisons(double a, double b, double c) {
-        BigDecimal A = new BigDecimal(a), B = new BigDecimal(b), C = new BigDecimal(c);
-        int signeDelta = B.multiply(B).subtract(A.multiply(C).multiply(BigDecimal.valueOf(4))).signum();
-        double[] r = g(a, b, c);
-        assertEquals(signeDelta + 1, r.length, "nombre de racines");   // Δ<0 → 0, Δ=0 → 1, Δ>0 → 2
-        for (double x : r) {
-            double res = Math.abs(a * x * x + b * x + c);
-            double ech = Math.abs(a) * x * x + Math.abs(b * x) + Math.abs(c);
-            assertTrue(res <= 8 * EPS * ech, "x = " + x + " : résidu " + res + " > " + 8 * EPS * ech);
+    /**
+     * Oracle de chaque cas généré :
+     * <ul>
+     *   <li>une classe invalide (coefficient NaN, ou a = 0) : IllegalArgumentException attendue ;</li>
+     *   <li>sinon : RA et Tol calculés par ReferenceExacte (Δ exact, puis 40 chiffres), puis N ≤ Tol.</li>
+     * </ul>
+     */
+    @ParameterizedTest(name = "[{index}] a = {0} | b = {1} | c = {2}")
+    @MethodSource("casPairwise")
+    @DisplayName("Pairwise : 9 catégories de réels, 81 cas au lieu de 729")
+    void pairwise(CategorieReel ca, CategorieReel cb, CategorieReel cc) {
+        double a = ca.valeur, b = cb.valeur, c = cc.valeur;
+        if (!Double.isFinite(a) || !Double.isFinite(b) || !Double.isFinite(c) || a == 0) {
+            assertThrows(IllegalArgumentException.class, () -> g(a, b, c));
+            return;
         }
+        verifierContreReference(a, b, c);
+    }
+
+    /** Oracle des cas générés : RA et Tol de ReferenceExacte, nombre de racines puis N ≤ Tol pour chacune. */
+    void verifierContreReference(double a, double b, double c) {
+        ReferenceExacte ref = ReferenceExacte.de(a, b, c);
+        double[] y = g(a, b, c);                        // y = g(DE)
+        assertEquals(ref.racines().length, y.length, "nombre de racines (signe exact de Δ)");
+        for (int i = 0; i < y.length; i++) {
+            double ra = ref.racines()[i], tol = ref.tolerances()[i];
+            assertTrue(ReferenceExacte.accepte(y[i], ra, tol),
+                    "racine " + i + " : y = " + y[i] + ", RA = " + ra + ", N = " + erreurRelative(y[i], ra) + ", Tol = " + tol);
+        }
+    }
+
+    /**
+     * Chapitre 5 : cas ajoutés pour tuer les mutants survivants de PIT (diapo 140, étape 4).
+     * Même oracle que le pairwise. Chaque ligne indique le mutant qu'elle tue.
+     */
+    @ParameterizedTest(name = "[{index}] ({0}, {1}, {2}) : {3}")
+    @CsvSource(delimiter = '|', textBlock = """
+            1e300 | 1e-300 | 0 | c = 0 avec b² sous MIN_VALUE : tue « if (c == 0) → false »
+            4     | -4     | 1 | racine double avec a ≠ 1 : tue « b / a → b * a »
+            """)
+    @DisplayName("Cas ajoutés après l'analyse des mutants (PIT)")
+    void casMutation(double a, double b, double c, String mutantVise) {
+        verifierContreReference(a, b, c);
+    }
+
+    /**
+     * Robustesse (diapo 90) : UNE seule classe invalide par cas, des valeurs valides partout ailleurs.
+     * Dans un cas pairwise qui combine deux classes invalides, la première erreur masque la seconde.
+     */
+    @ParameterizedTest(name = "[{index}] ({0}, {1}, {2}) → IllegalArgumentException")
+    @CsvSource({
+            "NaN, -3, 2", "Infinity, -3, 2", "-Infinity, -3, 2",
+            "1, NaN, 2", "1, Infinity, 2", "1, -Infinity, 2",
+            "1, -3, NaN", "1, -3, Infinity", "1, -3, -Infinity",
+            "0.0, -3, 2", "-0.0, -3, 2",
+    })
+    @DisplayName("Classes invalides : une seule par cas")
+    void classeInvalide(double a, double b, double c) {
+        assertThrows(IllegalArgumentException.class, () -> g(a, b, c));
     }
 
     /**

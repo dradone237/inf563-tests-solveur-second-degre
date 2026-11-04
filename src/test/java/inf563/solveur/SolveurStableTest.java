@@ -6,8 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 @DisplayName("Solveur STABLE (formule stable + mise à l'échelle)")
 class SolveurStableTest extends SuiteOraclesSolveur {
 
-    @Override
-    double[] g(double a, double b, double c) {
-        return Solveur.racines(a, b, c);
+    SolveurStableTest() {
+        super("inf563.solveur.SolveurStable");     // un nom (texte), pas une dépendance à la classe
     }
 }

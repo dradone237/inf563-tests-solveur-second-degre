@@ -14,8 +14,7 @@ import org.junit.jupiter.api.Tag;
 @DisplayName("Solveur NAÏF (formule du lycée)")
 class SolveurNaifTest extends SuiteOraclesSolveur {
 
-    @Override
-    double[] g(double a, double b, double c) {
-        return Solveur.racinesNaif(a, b, c);
+    SolveurNaifTest() {
+        super("inf563.solveur.SolveurNaif");       // un nom (texte), pas une dépendance à la classe
     }
 }

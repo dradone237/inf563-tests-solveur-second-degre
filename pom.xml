@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- INF563 - Fil rouge A : solveur d'équation du second degré (séances 2 et 3) -->
+    <!-- INF563 - Fil rouge A : solveur d'équation du second degré (séances 2 à 5) -->
     <groupId>inf563</groupId>
     <artifactId>solveur-second-degre</artifactId>
     <version>1.0</version>
@@ -58,9 +58,98 @@
                 <version>3.5.3</version>
                 <configuration>
                     <!-- Par défaut on n'exécute que la version stable (suite verte).
-                         La version naïve (qui DOIT échouer) se lance avec : mvnw test -Pnaif -->
+                         La version naïve (qui DOIT échouer) se lance avec : mvnw test -Pnaif
+                         Une implémentation quelconque, chargée par réflexion :
+                           mvnw test -Dsolveur.impl=nom.complet.DeLaClasse -->
                     <excludedGroups>${groupes.exclus}</excludedGroups>
                     <groups>${groupes.inclus}</groups>
+                </configuration>
+            </plugin>
+            <!-- Chapitre 5 : couverture de code avec JaCoCo (diapo 130).
+                 mvnw verify  → rapport dans target/site/jacoco/index.html
+                 prepare-agent instrumente le bytecode pendant les tests ; check fait échouer le build
+                 sous le seuil (quality gate). -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <configuration>
+                    <!-- On mesure l'implémentation livrée (SolveurStable). Exclues :
+                         Demo (affichage, pas un calcul) et SolveurNaif (contre-exemple pédagogique,
+                         ses tests sont exclus du build par défaut). -->
+                    <excludes>
+                        <exclude>inf563/solveur/Demo.class</exclude>
+                        <exclude>inf563/solveur/SolveurNaif.class</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>rapport</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Diapo 130 : 0.80 ; TP diapo 140 : 100 % des branches. Atteint
+                                 (16/16 branches de SolveurStable) : le seuil empêche de régresser. -->
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>1.00</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Chapitre 5 : test de mutation avec PIT (diapo 138).
+                 mvnw test-compile org.pitest:pitest-maven:mutationCoverage
+                 → rapport dans target/pit-reports/index.html (mutants tués / survivants, ligne par ligne) -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.15.3</version>
+                <dependencies>
+                    <!-- Diapo 138 : 1.2.1. Celle-ci tire junit-platform-launcher 1.9.2, incompatible
+                         avec JUnit 5.13 (« OutputDirectoryProvider not available ») : 1.2.3 corrige. -->
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>1.2.3</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <!-- on mute l'implémentation livrée, comme pour JaCoCo -->
+                    <targetClasses>
+                        <param>inf563.solveur.SolveurStable</param>
+                    </targetClasses>
+                    <!-- PIT exige une suite VERTE avant de muter : on écarte la suite naïve
+                         (échecs voulus) et la suite configurable (sans objet ici) -->
+                    <excludedGroups>
+                        <param>naif</param>
+                        <param>configurable</param>
+                    </excludedGroups>
+                    <mutators>
+                        <mutator>DEFAULTS</mutator>
+                    </mutators>
+                    <mutationThreshold>85</mutationThreshold>
+                    <timestampedReports>false</timestampedReports>
+                    <outputFormats>
+                        <param>HTML</param>
+                        <param>XML</param>
+                    </outputFormats>
                 </configuration>
             </plugin>
         </plugins>
@@ -73,7 +162,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <groupes.exclus>naif</groupes.exclus>
+                <groupes.exclus>naif,configurable</groupes.exclus>
                 <groupes.inclus></groupes.inclus>
             </properties>
         </profile>
@@ -82,6 +171,20 @@
             <properties>
                 <groupes.exclus></groupes.exclus>
                 <groupes.inclus>naif</groupes.inclus>
+            </properties>
+        </profile>
+        <!-- S'active tout seul dès que -Dsolveur.impl=... est donné : seule la suite
+             SolveurConfigurableTest s'exécute, contre la classe nommée. -->
+        <profile>
+            <id>configurable</id>
+            <activation>
+                <property>
+                    <name>solveur.impl</name>
+                </property>
+            </activation>
+            <properties>
+                <groupes.exclus></groupes.exclus>
+                <groupes.inclus>configurable</groupes.inclus>
             </properties>
         </profile>
     </profiles>

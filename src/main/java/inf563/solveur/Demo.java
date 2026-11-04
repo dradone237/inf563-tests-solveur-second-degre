@@ -18,13 +18,14 @@ public class Demo {
                 {1e-200, 1, 1e-200, "absorption", "[-1.0E200, -1.0E-200]"},
                 {1, -2, 1 - 1.1e-16, "Delta ~ 0 (mal conditionne)", "[0.99999998946..., 1.00000001054...]"},
         };
+        SolveurSecondDegre naif = new SolveurNaif(), stable = new SolveurStable();
         String format = "%-28s | %-34s | %-42s | %-42s | %s%n";
         System.out.printf(format, "Diagnostic", "(a, b, c)", "Naif", "Stable", "Attendu");
         System.out.println("-".repeat(190));
         for (Object[] l : cas) {
             double a = ((Number) l[0]).doubleValue(), b = ((Number) l[1]).doubleValue(), c = ((Number) l[2]).doubleValue();
             System.out.printf(format, l[3], "(" + a + ", " + b + ", " + c + ")",
-                    Arrays.toString(Solveur.racinesNaif(a, b, c)), Arrays.toString(Solveur.racines(a, b, c)), l[4]);
+                    Arrays.toString(naif.racines(a, b, c)), Arrays.toString(stable.racines(a, b, c)), l[4]);
         }
     }
 }
